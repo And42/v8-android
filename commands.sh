@@ -87,7 +87,7 @@ pushd v8
 
     git checkout "${ARG_V8_BRANCH}"
     gclient sync
-    gclient sync --deps=all || true # needed for third_party/catapult. Throws an error but we don't care. Otherwise v8 config fails during generation
+    gclient sync --deps=all || true # needed for third_party/catapult. Throws an error but we don't care. Otherwise, v8 config generation fails
 
     echo
     echo "Installing V8 build dependencies"
