@@ -1,0 +1,39 @@
+name: Build V8
+
+on:
+  workflow_dispatch:
+    inputs:
+      ARG_V8_BRANCH:
+        description: 'V8 branch to build. Example: "branch-heads/13.6"'
+        required: true
+        type: string
+      ARG_NDK_RELEASE:
+        description: 'NDK release version. Example: "r28c"'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:bookworm-slim
+    strategy:
+      matrix:
+        ARG_PLATFORM_BITS: ["32", "64"]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Make commands.sh executable
+      run: chmod +x commands.sh
+    
+    - name: Execute build script
+      run: ./commands.sh "${{ matrix.ARG_PLATFORM_BITS }}" "${{ inputs.ARG_V8_BRANCH }}" "${{ inputs.ARG_NDK_RELEASE }}"
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: v8-artifacts-${{ matrix.ARG_PLATFORM_BITS }}bit
+        path: /home/v8-building/artifacts/
+        if-no-files-found: error
