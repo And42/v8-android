@@ -40,7 +40,7 @@ apt install -y \
 # git - cloning repos
 # unzip - unpacking android ndk
 # zip - packing artifacts
-# curl, wget - downloading depot tools
+# curl, wget - downloading depot tools data and ndk
 # python3 - needed for v8 scripts
 # lsb-release, file - to find missing dependencies for v8 building
 # sudo - to install missing dependencies for v8 building
@@ -86,10 +86,8 @@ pushd v8
     echo
 
     git checkout "${ARG_V8_BRANCH}"
-    # git switch main
-    # git pull
     gclient sync
-    # gclient sync --force --deps=all # maybe needed for
+    gclient sync --deps=all || true # needed for third_party/catapult. Throws an error but we don't care. Otherwise v8 config fails during generation
 
     echo
     echo "Installing V8 build dependencies"
@@ -108,7 +106,7 @@ echo
 echo "Setting up NDK"
 echo
 
-wget --output-document=ndk.zip https://dl.google.com/android/repository/android-ndk-r26d-linux.zip
+wget --output-document=ndk.zip --progress=dot:giga https://dl.google.com/android/repository/android-ndk-r26d-linux.zip
 unzip ndk.zip -d ndk-temp
 mkdir ndk
 cp --recursive ndk-temp/*/. ndk
