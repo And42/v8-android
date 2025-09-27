@@ -14,6 +14,7 @@ on:
 
 jobs:
   build:
+    name: build (arm${{ matrix.ARG_PLATFORM_BITS }})
     runs-on: ubuntu-latest
     container:
       image: debian:bookworm-slim

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e # fail on any error
 set -o verbose # print commands as they are executed
 
