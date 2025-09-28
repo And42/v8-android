@@ -133,6 +133,7 @@ pushd v8
         # disable icu external file to not deal with filesystem
         "icu_use_data_file=false"
 
+        # disable sandbox - not sure 100% if we need it or not, but in the previous version of v8 it was disabled, so disabling it for now
         "v8_enable_sandbox=false"
 
         # disable internationalization support for now - maybe will need it later
