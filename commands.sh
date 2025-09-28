@@ -3,6 +3,13 @@
 set -e # fail on any error
 set -o verbose # print commands as they are executed
 
+if [ $# -ne 3 ]; then
+    echo "Error: Exactly 3 arguments are required"
+    echo "Usage: $0 <ARG_PLATFORM_BITS=\"32\"|\"64\"> <ARG_V8_BRANCH> <ARG_NDK_RELEASE>"
+    echo "Example usage: $0 \"64\" \"branch-heads/13.6\" \"r28c\""
+    exit 1
+fi
+
 ARG_PLATFORM_BITS=$1 # example: "64"
 ARG_V8_BRANCH=$2 # example: "branch-heads/13.6"
 ARG_NDK_RELEASE=$3 # example: "r28c"
