@@ -17,6 +17,7 @@ ARG_NDK_RELEASE=$3 # example: "r28c"
 WORKING_DIRECTORY="/home/v8-building"
 DEPOT_TOOLS_DIRECTORY="${WORKING_DIRECTORY}/depot_tools"
 ARTIFACTS_DIRECTORY="${WORKING_DIRECTORY}/artifacts"
+NDK_DIRECTORY="${WORKING_DIRECTORY}/ndk"
 
 echo
 echo "Arguments:"
@@ -115,8 +116,8 @@ echo
 
 wget --output-document=ndk.zip --progress=dot:giga "https://dl.google.com/android/repository/android-ndk-${ARG_NDK_RELEASE}-linux.zip"
 unzip -q ndk.zip -d ndk-temp
-mkdir ndk
-cp --recursive ndk-temp/*/. ndk
+mkdir "${NDK_DIRECTORY}"
+cp --recursive ndk-temp/*/. "${NDK_DIRECTORY}"
 rm --recursive --force ndk-temp ndk.zip
 
 pushd v8
@@ -150,7 +151,7 @@ pushd v8
         "v8_monolithic=true"
 
         # use the specific version of android ndk instead of the one bundled with v8
-        "android_ndk_root=\"${WORKING_DIRECTORY}/ndk\""
+        "android_ndk_root=\"${NDK_DIRECTORY}\""
 
         # use the standard library from the android ndk instead if the custom one bundled with v8.
         # if we use the bundled one, then we get compilation errors after adding the resulting static library to the project,
@@ -197,7 +198,7 @@ pushd v8
 
 popd
 
-# "${WORKING_DIRECTORY}/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++" `# check android21 - should match API level` \
+# "${NDK_DIRECTORY}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++" `# check android21 - should match API level` \
 #     -shared -o "${ARTIFACTS_DIRECTORY}/libv8_monolith.so" \
 #     -Wl,--gc-sections \
 #     -Wl,--strip-all \
