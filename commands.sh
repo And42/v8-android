@@ -114,7 +114,7 @@ echo "Setting up NDK"
 echo
 
 wget --output-document=ndk.zip --progress=dot:giga "https://dl.google.com/android/repository/android-ndk-${ARG_NDK_RELEASE}-linux.zip"
-unzip ndk.zip -d ndk-temp
+unzip -q ndk.zip -d ndk-temp
 mkdir ndk
 cp --recursive ndk-temp/*/. ndk
 rm -rf ndk-temp ndk.zip
