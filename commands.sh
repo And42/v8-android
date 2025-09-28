@@ -117,7 +117,7 @@ wget --output-document=ndk.zip --progress=dot:giga "https://dl.google.com/androi
 unzip -q ndk.zip -d ndk-temp
 mkdir ndk
 cp --recursive ndk-temp/*/. ndk
-rm -rf ndk-temp ndk.zip
+rm --recursive --force ndk-temp ndk.zip
 
 pushd v8
 
