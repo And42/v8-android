@@ -147,6 +147,18 @@ pushd v8
         # bundle external data (example: snapshot blob) into the v8 library to not deal with filesystem
         "v8_use_external_startup_data=false"
 
+        # enable more optimizations - according to v8 devs this should be true for every release build shipped to end users
+        "is_official_build=true"
+
+        # pgo = profile guided optimizations - these optimizations are turned on when is_official_build=true,
+        # but they need special files to optimize code and we don't have those files. So we disable this feature
+        "chrome_pgo_phase=0"
+
+        # enables linking time optimizations when set to "true" - it is set to true automatically when is_official_build=true.
+        # couldn't make it work due some clang incompatibilities (custom clang 21 is used in v8, but android ndk r28c has clang 19).
+        # tried setting "clang_base_path" and "clang_version", but it didn't help, so, disabling for now
+        "use_thin_lto=false"
+
         # enable v8_monolith compilation target which builds a single static library containing the whole v8
         "v8_monolithic=true"
 
