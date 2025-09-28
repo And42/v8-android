@@ -31,10 +31,14 @@ jobs:
     
     - name: Execute build script
       run: ./commands.sh "${{ matrix.ARG_PLATFORM_BITS }}" "${{ inputs.ARG_V8_BRANCH }}" "${{ inputs.ARG_NDK_RELEASE }}"
-    
+
+    - name: Sanitize branch name for the artifact by replacing '/' with '-'
+      id: sanitize
+      run: echo "branch_name=$(echo '${{ inputs.ARG_V8_BRANCH }}' | tr '/' '-')" >> $GITHUB_OUTPUT
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: v8-artifacts-${{ matrix.ARG_PLATFORM_BITS }}bit
+        name: v8-${{ steps.sanitize.outputs.branch_name }}-ndk-${{ inputs.ARG_NDK_RELEASE }}-${{ matrix.ARG_PLATFORM_BITS }}bit
         path: /home/v8-building/artifacts/
         if-no-files-found: error
