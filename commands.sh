@@ -128,35 +128,51 @@ pushd v8
     echo "Generating v8 configuration"
     echo
 
+    COMMON_GEN_ARGS=(
+        # disable icu external file to not deal with filesystem
+        "icu_use_data_file=false"
+
+        "v8_enable_sandbox=false"
+
+        # disable internationalization support for now - maybe will need it later
+        "v8_enable_i18n_support=false"
+
+        # disable webassembly - we don't use it.
+        # disabling it reduces the size of the resulting library:
+        #   libv8_monolith.a: 464 308 704 bytes -> 358 764 498 bytes = 105 544 206 bytes smaller ~ 101 MiB smaller = 22.7% smaller
+        #   libv8_monolith.so: 23 583 472 bytes -> 18 019 528 bytes = 5 563 944 bytes smaller ~ 5.3 MiB smaller = 23.6% smaller
+        "v8_enable_webassembly=false"
+
+        # bundle external data (example: snapshot blob) into the v8 library to not deal with filesystem
+        "v8_use_external_startup_data=false"
+
+        # enable v8_monolith compilation target which builds a single static library containing the whole v8
+        "v8_monolithic=true"
+
+        # use the specific version of android ndk instead of the one bundled with v8
+        "android_ndk_root=\"${WORKING_DIRECTORY}/ndk\""
+
+        # use the standard library from the android ndk instead if the custom one bundled with v8.
+        # if we use the bundled one, then we get compilation errors after adding the resulting static library to the project,
+        # because those 2 libraries are incompatible with each other.
+        # there might be a workaround if we build NOT the static v8 library (.a) but a shared library (.so) instead and bundle the custom standard library into the .so
+        # but I haven't tried that yet
+        "use_custom_libcxx=false"
+    )
+
     if [[ "${ARG_PLATFORM_BITS}" = "32" ]]; then
         OUT_DIR="arm32.release"
-
-        # x32
-        python3 tools/dev/v8gen.py -b android.arm.release "${OUT_DIR}" -- \
-            is_component_build=false \
-            icu_use_data_file=false \
-            v8_enable_sandbox=false \
-            v8_enable_i18n_support=false `# check` \
-            v8_use_external_startup_data=false \
-            v8_monolithic=true \
-            android_ndk_root=\"${WORKING_DIRECTORY}/ndk\" \
-            use_custom_libcxx=false
+        UNIQUE_GEN_ARGS=()
     else
         OUT_DIR="arm64.release"
-
-        # x64
-        python3 tools/dev/v8gen.py -b android.arm.release "${OUT_DIR}" -- \
-            target_cpu=\"arm64\" \
-            v8_target_cpu=\"arm64\" \
-            is_component_build=false \
-            icu_use_data_file=false \
-            v8_enable_sandbox=false \
-            v8_enable_i18n_support=false `# check` \
-            v8_use_external_startup_data=false \
-            v8_monolithic=true \
-            android_ndk_root=\"${WORKING_DIRECTORY}/ndk\" \
-            use_custom_libcxx=false
+        UNIQUE_GEN_ARGS=(
+            "target_cpu=\"arm64\""
+        )
     fi
+
+    python3 tools/dev/v8gen.py -b android.arm.release "${OUT_DIR}" -- \
+        "${COMMON_GEN_ARGS[@]}" \
+        "${UNIQUE_GEN_ARGS[@]}"
 
     echo
     echo "Listing build flags"
@@ -181,16 +197,16 @@ pushd v8
 
 popd
 
-    # ../ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++ \
-    #     -shared -o "out.gn/arm64.release/libv8_monolith.so" \
-    #   -Wl,--gc-sections \
-    #   -Wl,--strip-all \
-    #   -Wl,--exclude-libs,ALL \
-    #     -Wl,--whole-archive \
-    #     "out.gn/arm64.release/obj/libv8_monolith.a" \
-    #     -Wl,--no-whole-archive \
-    #     -llog -landroid -lm -ldl
+# "${WORKING_DIRECTORY}/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++" `# check android21 - should match API level` \
+#     -shared -o "${ARTIFACTS_DIRECTORY}/libv8_monolith.so" \
+#     -Wl,--gc-sections \
+#     -Wl,--strip-all \
+#     -Wl,--exclude-libs,ALL \
+#     -Wl,--whole-archive \
+#     "${ARTIFACTS_DIRECTORY}/libv8_monolith.a" \
+#     -Wl,--no-whole-archive \
+#     -llog -landroid -lm -ldl
 
 
-    # use_sysroot=false
-    # v8_enable_lite_mode=true - for not jit
+# use_sysroot=false
+# v8_enable_lite_mode=true - for not jit
