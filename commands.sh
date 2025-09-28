@@ -29,9 +29,9 @@ echo
 echo "Installing system packages"
 echo
 
-apt update
+apt-get update
 
-apt install -y \
+apt-get install --assume-yes \
     git \
     unzip \
     zip \
