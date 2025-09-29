@@ -189,12 +189,28 @@ pushd v8
         "${UNIQUE_GEN_ARGS[@]}"
 
     echo
-    echo "Listing build flags"
+    echo "Copying artifacts 1"
     echo
 
-    BUILD_FLAGS_FILE="${ARTIFACTS_DIRECTORY}/v8_build_flags.txt"
-    gn desc "out.gn/${OUT_DIR}" //:v8_monolith defines >> "${BUILD_FLAGS_FILE}"
-    cat "${BUILD_FLAGS_FILE}"
+    zip -r "${ARTIFACTS_DIRECTORY}/include.zip" include
+
+    BUILD_FLAGS_ARTIFACT="${ARTIFACTS_DIRECTORY}/v8_build_flags.txt"
+    gn desc "out.gn/${OUT_DIR}" //:v8_monolith defines > "${BUILD_FLAGS_ARTIFACT}"
+    echo "Build flags:"
+    cat "${BUILD_FLAGS_ARTIFACT}"
+    echo
+
+    ARGS_GN_ARTIFACT="${ARTIFACTS_DIRECTORY}/args.gn"
+    cp "out.gn/${OUT_DIR}/args.gn" "${ARGS_GN_ARTIFACT}"
+    echo "args.gn content:"
+    cat "${ARGS_GN_ARTIFACT}"
+    echo
+
+    GN_ARGS_LIST_ARTIFACT="${ARTIFACTS_DIRECTORY}/gn-args-list.txt"
+    gn args "out.gn/${OUT_DIR}" --list > "${GN_ARGS_LIST_ARTIFACT}"
+    echo "gn args list:"
+    cat "${GN_ARGS_LIST_ARTIFACT}"
+    echo
 
     echo
     echo "Building v8"
@@ -203,11 +219,10 @@ pushd v8
     ninja -C "out.gn/${OUT_DIR}" v8_monolith
 
     echo
-    echo "Copying artifacts"
+    echo "Copying artifacts 2"
     echo
 
     cp "out.gn/${OUT_DIR}/obj/libv8_monolith.a" "${ARTIFACTS_DIRECTORY}/libv8_monolith.a"
-    zip -r "${ARTIFACTS_DIRECTORY}/include.zip" include
 
 popd
 
